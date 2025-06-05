@@ -24,4 +24,4 @@ Weather Wardrobe is a React-based web application that allows users to browse an
 - **Font Integration**: Custom font (Cabinet Grotesk)
 - **File Structure**: Organized by component, utility, and asset folders
 
-https://github.com/ttonjee/se_project_react.git
+https://ttonjee.github.io/se_project_react/
