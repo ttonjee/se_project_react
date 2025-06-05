@@ -1,3 +1,4 @@
+import Footer from "../Footer/Footer";
 import { useState } from "react";
 import { useEffect } from "react";
 import "./App.css";
@@ -118,6 +119,7 @@ function App() {
         card={selectedCard}
         handleClose={closeActiveModal}
       />
+      <Footer />
     </div>
   );
 }

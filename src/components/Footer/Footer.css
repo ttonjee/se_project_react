@@ -1,0 +1,18 @@
+.footer {
+  width: 100%;
+  background-color: transparent; /* or your background color */
+  padding: 20px 0;
+}
+
+.footer__content {
+  font-family: "Cabinet Grotesk", Helvetica, Arial, sans-serif;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: auto;
+  padding: 100px 24px;
+}
