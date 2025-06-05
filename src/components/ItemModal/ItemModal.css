@@ -1,0 +1,60 @@
+.item__modal-close {
+  background-image: url(../../assets/closebtn.png);
+  background-repeat: no-repeat;
+  color: rgba(255, 255, 255, 1);
+  position: absolute;
+  top: 24px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  opacity: 40%;
+  cursor: pointer;
+  padding: 0;
+  position: absolute;
+}
+.item__modal-content {
+  position: relative;
+  padding: 28px 28px 36px;
+  max-width: 496px;
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.item__modal_content.item__modal_content_image {
+  background-color: #fff;
+  width: 498px;
+  height: 610px;
+  border-radius: 16px;
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+}
+
+.item__modal-image {
+  max-width: 100%;
+  height: 498px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.item__footer {
+  padding: 20px 32px 32px;
+}
+
+.item__modal-caption {
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  color: rgba(0, 0, 0, 1);
+  font-size: 20px;
+  margin: 0 0 12px 0;
+}
+
+.item__modal-weather {
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  color: rgba(0, 0, 0, 1);
+  font-size: 20px;
+  margin: 0;
+}
