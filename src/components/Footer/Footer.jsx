@@ -3,10 +3,12 @@ import "./Footer.css";
 
 function Footer() {
   return (
-    <div className="footer__content">
-      <p>Developed by Texan Tonjee &copy;</p>
-      <p>{new Date().getFullYear()}</p>
-    </div>
+    <footer className="footer">
+      <div className="footer__content">
+        <p className="footer__text">Developed by Texan Tonjee &copy;</p>
+        <p className="footer__text">{new Date().getFullYear()}</p>
+      </div>
+    </footer>
   );
 }
 
