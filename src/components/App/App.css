@@ -1,6 +1,6 @@
 .page {
   background-color: rgba(243, 243, 243, 1);
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
 }
 

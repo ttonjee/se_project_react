@@ -43,6 +43,7 @@
 
 .item__footer {
   padding: 20px 32px 32px;
+  position: relative;
 }
 
 .item__modal-caption {
@@ -57,4 +58,16 @@
   color: rgba(0, 0, 0, 1);
   font-size: 20px;
   margin: 0;
+}
+
+.item__modal-delete-btn {
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  font-size: 20px;
+  color: rgba(255, 77, 0, 1);
+  letter-spacing: 0;
+  border: none;
+  background-color: #fff;
+  position: absolute;
+  top: 17px;
+  right: 23px;
 }
