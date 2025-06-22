@@ -15,7 +15,7 @@ import AddItemModal from "../AddItemModal/AddItemModal";
 import { defaultClothingItems } from "../../utils/constants";
 import Profile from "../Profile/Profile";
 import SideBar from "../SideBar/SideBar";
-import { getItems } from "../../utils/api";
+import { getItems, postItem, deleteItem } from "../../utils/api";
 
 function App() {
   const [weatherData, setweatherData] = useState({
@@ -48,15 +48,16 @@ function App() {
   };
 
   const handleAddItemModalSubmit = ({ name, imageUrl, weather }) => {
-    const newItem = {
-      name,
-      link: imageUrl,
-      weather,
-      _id: Date.now(), // or use uuid if needed
-    };
-    setClothingItems([newItem, ...clothingItems]);
-    closeActiveModal();
+    postItem({ name, imageUrl, weather })
+      .then((newItem) => {
+        setClothingItems([newItem, ...clothingItems]); // update state with new item
+        closeActiveModal(); // close modal after successful submission
+      })
+      .catch((err) => {
+        console.error("Error adding new item:", err);
+      });
   };
+
   useEffect(() => {
     getWeather(coordinates, APIkey)
       .then((data) => {
@@ -66,22 +67,33 @@ function App() {
       })
       .catch(console.error);
   }, []);
+
   useEffect(() => {
     getItems()
       .then((data) => {
-        setClothingItems(data);
-        console.log(data);
+        // ensure the data has consistent field names
+        const normalized = data.map((item) => ({
+          ...item,
+          link: item.link || item.imageUrl,
+        }));
+        setClothingItems(normalized);
       })
       .catch(console.error);
   }, []);
 
   const handleDeleteCard = (cardToDelete) => {
     console.log("Deleting card:", cardToDelete);
-    const updatedItems = clothingItems.filter(
-      (item) => item._id !== cardToDelete._id
-    );
-    setClothingItems(updatedItems);
-    setActiveModal("");
+
+    deleteItem(cardToDelete._id)
+      .then(() => {
+        // Update state after successful deletion
+        const updatedItems = clothingItems.filter(
+          (item) => item._id !== cardToDelete._id
+        );
+        setClothingItems(updatedItems);
+        setActiveModal("");
+      })
+      .catch((err) => console.error("Failed to delete:", err));
   };
 
   return (
