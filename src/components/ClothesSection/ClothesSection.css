@@ -12,6 +12,7 @@
   color: rgba(0, 0, 0, 0.6);
   border: none;
   margin: 0;
+  cursor: pointer;
 }
 
 .clothes__section-content {

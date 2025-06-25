@@ -10,7 +10,7 @@ import ModalWithForm from "../ModalWithForm/ModalWithForm";
 import ItemModal from "../ItemModal/ItemModal";
 import { filterWeatherData, getWeather } from "../../utils/weatherApi";
 import { coordinates, APIkey } from "../../utils/constants";
-import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnit";
+import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
 import AddItemModal from "../AddItemModal/AddItemModal";
 import { defaultClothingItems } from "../../utils/constants";
 import Profile from "../Profile/Profile";
@@ -71,11 +71,14 @@ function App() {
   useEffect(() => {
     getItems()
       .then((data) => {
-        // ensure the data has consistent field names
-        const normalized = data.map((item) => ({
-          ...item,
-          link: item.link || item.imageUrl,
-        }));
+        // Normalize and sort items so newest appear first
+        const normalized = data
+          .map((item) => ({
+            ...item,
+            link: item.link || item.imageUrl,
+          }))
+          .sort((a, b) => b._id - a._id); // sort by _id descending
+
         setClothingItems(normalized);
       })
       .catch(console.error);
@@ -134,7 +137,6 @@ function App() {
           activeModal={activeModal}
           card={selectedCard}
           handleClose={closeActiveModal}
-          isOpen={activeModal === "preview"}
           onDelete={handleDeleteCard}
         />
         <Footer />
