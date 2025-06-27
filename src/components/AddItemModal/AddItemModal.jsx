@@ -7,12 +7,17 @@ function AddItemModal({ handleClose, isOpen, activeModal, onSubmit }) {
   const [imageUrl, setImageUrl] = useState("");
   const [weather, setWeather] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ name, imageUrl, weather });
-    setName("");
-    setImageUrl("");
-    setWeather("");
+
+    try {
+      await onSubmit({ name, imageUrl, weather });
+      setName("");
+      setImageUrl("");
+      setWeather("");
+    } catch (error) {
+      console.error("Submission failed:", error);
+    }
   };
 
   return (

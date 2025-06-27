@@ -7,7 +7,11 @@ function ClothesSection({ onCardClick, clothingItems }) {
     <div className="clothes__section">
       <div className="clothes__section-content">
         <p className="clothes__section-title">Your Item</p>
-        <button type="button" className="clothes__section_add-btn">
+        <button
+          type="button"
+          className="clothes__section_add-btn"
+          onClick={onCardClick}
+        >
           + Add new
         </button>
       </div>

@@ -46,15 +46,14 @@ function App() {
   const closeActiveModal = () => {
     setActiveModal("");
   };
-
   const handleAddItemModalSubmit = ({ name, imageUrl, weather }) => {
     postItem({ name, imageUrl, weather })
       .then((newItem) => {
-        setClothingItems([newItem, ...clothingItems]); // update state with new item
-        closeActiveModal(); // close modal after successful submission
+        console.log("✅ New item received:", newItem);
+        setClothingItems((prevItems) => [newItem, ...prevItems]);
       })
-      .catch((err) => {
-        console.error("Error adding new item:", err);
+      .catch((error) => {
+        console.error("Failed to post item:", error);
       });
   };
 

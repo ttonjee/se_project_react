@@ -1,6 +1,7 @@
 .item__modal-close {
   background-image: url(../../assets/closebtn.png);
   background-repeat: no-repeat;
+  background-color: transparent;
   color: rgba(255, 255, 255, 1);
   position: absolute;
   top: 24px;
