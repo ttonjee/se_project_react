@@ -122,6 +122,7 @@ function App() {
                 <Profile
                   onCardClick={handleCardClick}
                   clothingItems={clothingItems}
+                  handleAddClick={handleAddClick}
                 />
               }
             />
@@ -131,6 +132,7 @@ function App() {
           handleClose={closeActiveModal}
           isOpen={activeModal === "add-garment"}
           onSubmit={handleAddItemModalSubmit}
+          activeModal={activeModal}
         />
         <ItemModal
           activeModal={activeModal}

@@ -10,7 +10,6 @@ function ItemCard({ item, onCardClick }) {
         onClick={handleCardClick}
         className="card__image"
         src={item.imageUrl}
-        z
         alt={item.name}
       />
     </li>

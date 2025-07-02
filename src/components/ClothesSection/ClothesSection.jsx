@@ -2,7 +2,7 @@ import "../ClothesSection/ClothesSection.css";
 import Profile from "../Profile/Profile";
 import ItemCard from "../ItemCard/ItemCard";
 
-function ClothesSection({ onCardClick, clothingItems }) {
+function ClothesSection({ onCardClick, clothingItems, handleAddClick }) {
   return (
     <div className="clothes__section">
       <div className="clothes__section-content">
@@ -10,7 +10,7 @@ function ClothesSection({ onCardClick, clothingItems }) {
         <button
           type="button"
           className="clothes__section_add-btn"
-          onClick={onCardClick}
+          onClick={handleAddClick}
         >
           + Add new
         </button>

@@ -1,11 +1,20 @@
 import "../AddItemModal/AddItemModal.css";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
 function AddItemModal({ handleClose, isOpen, activeModal, onSubmit }) {
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [weather, setWeather] = useState("");
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setName("");
+      setImageUrl("");
+      setWeather("");
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +24,7 @@ function AddItemModal({ handleClose, isOpen, activeModal, onSubmit }) {
       setName("");
       setImageUrl("");
       setWeather("");
+      handleClose(); // ✅ Close modal after successful submit
     } catch (error) {
       console.error("Submission failed:", error);
     }
@@ -30,75 +40,52 @@ function AddItemModal({ handleClose, isOpen, activeModal, onSubmit }) {
       onSubmit={handleSubmit}
     >
       <label htmlFor="name" className="modal__label">
-        Name{""}
+        Name
         <input
           type="text"
           className="modal__input-line"
           id="name"
           placeholder="Name"
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
+          onChange={(e) => setName(e.target.value)}
           value={name}
+          required
         />
       </label>
+
       <label htmlFor="imageUrl" className="modal__label">
-        Image{""}
+        Image URL
         <input
-          type="text"
+          type="url"
           className="modal__input-line"
           id="imageUrl"
           placeholder="Image URL"
-          onChange={(e) => {
-            setImageUrl(e.target.value);
-          }}
+          onChange={(e) => setImageUrl(e.target.value)}
           value={imageUrl}
+          required
         />
       </label>
+
       <fieldset className="modal__radio-btns">
-        <legend className="modal__legend">select the weather type:</legend>
-        <label htmlFor="hot" className="modal__label modal__label_type_radio">
-          <input
-            id="hot"
-            name="weatherType"
-            type="radio"
-            value="hot"
-            className="modal__radio-input"
-            checked={weather === "hot"}
-            onChange={(e) => {
-              setWeather(e.target.value);
-            }}
-          />
-          <span>Hot</span>
-        </label>
-        <label htmlFor="warm" className="modal__label modal__label_type_radio">
-          <input
-            id="warm"
-            name="weatherType"
-            type="radio"
-            value="warm"
-            className="modal__radio-input"
-            checked={weather === "warm"}
-            onChange={(e) => {
-              setWeather(e.target.value);
-            }}
-          />
-          <span>Warm</span>
-        </label>
-        <label htmlFor="cold" className="modal__label modal__label_type_radio">
-          <input
-            id="cold"
-            name="weatherType"
-            type="radio"
-            value="cold"
-            className="modal__radio-input"
-            checked={weather === "cold"}
-            onChange={(e) => {
-              setWeather(e.target.value);
-            }}
-          />
-          <span>Cold</span>
-        </label>
+        <legend className="modal__legend">Select the weather type:</legend>
+        {["hot", "warm", "cold"].map((type) => (
+          <label
+            key={type}
+            htmlFor={type}
+            className="modal__label modal__label_type_radio"
+          >
+            <input
+              id={type}
+              name="weatherType"
+              type="radio"
+              value={type}
+              className="modal__radio-input"
+              checked={weather === type}
+              onChange={(e) => setWeather(e.target.value)}
+              required
+            />
+            <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+          </label>
+        ))}
       </fieldset>
     </ModalWithForm>
   );
