@@ -44,3 +44,21 @@
   margin: 0;
   max-width: fit-content;
 }
+.header__signup-btn {
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  color: rgba(0, 0, 0, 1);
+  font-size: 20px;
+  margin-right: 20px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.header__login-btn {
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  color: rgba(0, 0, 0, 1);
+  font-size: 20px;
+  margin-right: 20px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}

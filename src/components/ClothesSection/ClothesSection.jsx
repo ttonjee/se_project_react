@@ -1,12 +1,20 @@
 import "../ClothesSection/ClothesSection.css";
-import Profile from "../Profile/Profile";
 import ItemCard from "../ItemCard/ItemCard";
+import { useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 function ClothesSection({ onCardClick, clothingItems, handleAddClick }) {
+  const currentUser = useContext(CurrentUserContext);
+
+  // Filter clothing items to only include those owned by the current user
+  const userItems = clothingItems.filter(
+    (item) => item.owner === currentUser?._id
+  );
+
   return (
     <div className="clothes__section">
       <div className="clothes__section-content">
-        <p className="clothes__section-title">Your Item</p>
+        <p className="clothes__section-title">Your Items</p>
         <button
           type="button"
           className="clothes__section_add-btn"
@@ -15,13 +23,17 @@ function ClothesSection({ onCardClick, clothingItems, handleAddClick }) {
           + Add new
         </button>
       </div>
-      <ul className="cards__list">
-        {clothingItems.map((item) => {
-          return (
+      {userItems.length > 0 ? (
+        <ul className="cards__list">
+          {userItems.map((item) => (
             <ItemCard key={item._id} item={item} onCardClick={onCardClick} />
-          );
-        })}
-      </ul>
+          ))}
+        </ul>
+      ) : (
+        <p className="clothes__section-empty">
+          You haven’t added any items yet.
+        </p>
+      )}
     </div>
   );
 }

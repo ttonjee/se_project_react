@@ -6,3 +6,42 @@
 .profile__clothes-items {
   margin-top: 18px;
 }
+
+.sign-out-button {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.profile__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.profile__edit-button {
+  background-color: transparent;
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  font-size: 20px;
+  cursor: pointer;
+  border: none;
+}
+
+.profile__sign-out-button {
+  border: none;
+  font-family: "Cabinet Grotesk", Helvetic, Arial, sans-serif;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 1);
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.sign-out-button:hover {
+  background-color: #d32f2f;
+}

@@ -1,6 +1,6 @@
 import "../SideBar/SideBar.css";
 import avatar from "../../assets/avatar.png";
-function SideBar() {
+function SideBar({ handleLogout }) {
   return (
     <div className="sidebar">
       <img className="sidebar__avatar" src={avatar} alt="Default avatar" />

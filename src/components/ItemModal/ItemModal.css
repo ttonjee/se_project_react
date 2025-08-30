@@ -73,3 +73,7 @@
   right: 23px;
   cursor: pointer;
 }
+
+.item__modal-delete-btn_hidden {
+  display: none;
+}
