@@ -14,7 +14,13 @@ import AddItemModal from "../AddItemModal/AddItemModal";
 import { defaultClothingItems } from "../../utils/constants";
 import Profile from "../Profile/Profile";
 import SideBar from "../SideBar/SideBar";
-import { getItems, postItem, deleteItem } from "../../utils/api";
+import {
+  getItems,
+  postItem,
+  deleteItem,
+  addCardLike,
+  removeCardLike,
+} from "../../utils/api";
 import LoginModal from "../LoginModal/LoginModal";
 import { register, login, checkToken, updateUser } from "../../utils/auth";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
@@ -23,7 +29,7 @@ import CurrentUserContext from "../../contexts/CurrentUserContext";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 
 function App() {
-  const [weatherData, setweatherData] = useState({
+  const [weatherData, setWeatherData] = useState({
     type: "",
     temp: { F: 999, C: 999 },
     city: "",
@@ -151,49 +157,30 @@ function App() {
     getWeather(coordinates, APIkey)
       .then((data) => {
         const filteredData = filterWeatherData(data);
-        setweatherData(filteredData);
+        setWeatherData(filteredData);
       })
       .catch(console.error);
   }, []);
 
-  // Auto-login from localStorage
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
-      getUserInfo(token)
-        .then((userData) => {
-          setCurrentUser(userData);
-        })
-        .catch((err) => {
-          console.error("Token invalid or expired:", err);
-          localStorage.removeItem("jwt");
-        });
-    }
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("jwt");
-
-    if (!token) {
-      console.warn("No token found, skipping items fetch");
-      return;
-    }
-
-    getItems(token)
+    // Fetch items for all users (public endpoint)
+    getItems()
       .then((data) => {
         const normalized = data
           .map((item) => ({
             ...item,
-            link: item.link || item.imageUrl,
+            link: item.imageUrl || item.link,
           }))
-          .sort((a, b) => b._id - a._id); // sort by _id descending
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         setClothingItems(normalized);
       })
       .catch((err) => {
         console.error("Failed to fetch items:", err);
+        // Fallback to default items if server fails
+        setClothingItems(defaultClothingItems);
       });
-  }, [currentUser]);
+  }, []);
 
   const handleDeleteCard = (cardToDelete) => {
     const token = localStorage.getItem("jwt");
@@ -251,8 +238,7 @@ function App() {
 
     if (!isLiked) {
       // Add like
-      api
-        .addCardLike(id, token)
+      addCardLike(id, token)
         .then((updatedCard) => {
           setClothingItems((items) =>
             items.map((item) => (item._id === id ? updatedCard : item))
@@ -261,8 +247,7 @@ function App() {
         .catch((err) => console.log(err));
     } else {
       // Remove like
-      api
-        .removeCardLike(id, token)
+      removeCardLike(id, token)
         .then((updatedCard) => {
           setClothingItems((items) =>
             items.map((item) => (item._id === id ? updatedCard : item))
@@ -297,6 +282,7 @@ function App() {
                     weatherData={weatherData}
                     handleCardClick={handleCardClick}
                     clothingItems={clothingItems}
+                    onCardLike={handleCardLike}
                   />
                 }
               />
@@ -310,8 +296,9 @@ function App() {
                       handleAddClick={handleAddClick}
                       currentUser={currentUser}
                       onLogout={handleLogout}
-                      // Pass down the handler to open edit profile modal to Profile page
                       onEditProfileClick={openEditProfileModal}
+                      onCardLike={handleCardLike}
+                      onUpdateUser={handleUpdateUser}
                     />
                   </ProtectedRoute>
                 }

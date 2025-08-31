@@ -1,14 +1,19 @@
 import "./ItemCard.css";
+import { useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-function ItemCard({ item, onCardClick, onCardLike, currentUser }) {
+function ItemCard({ item, onCardClick, onCardLike }) {
+  const currentUser = useContext(CurrentUserContext);
+
   const handleCardClick = () => {
     onCardClick(item);
   };
 
   // Check if the item was liked by the current user
-  const isLiked = currentUser
-    ? item.likes.some((id) => id === currentUser._id)
-    : false;
+  const isLiked =
+    currentUser && item.likes
+      ? item.likes.some((id) => id === currentUser._id)
+      : false;
 
   // Class name for like button: add active class if liked
   const itemLikeButtonClassName = `card__like-button ${
@@ -16,7 +21,7 @@ function ItemCard({ item, onCardClick, onCardLike, currentUser }) {
   }`;
 
   const handleLike = () => {
-    if (!currentUser) return; // Extra safety, button should be hidden if no user
+    if (!currentUser) return;
     onCardLike({ id: item._id, isLiked });
   };
 
@@ -26,7 +31,7 @@ function ItemCard({ item, onCardClick, onCardLike, currentUser }) {
       <img
         onClick={handleCardClick}
         className="card__image"
-        src={item.imageUrl}
+        src={item.link} // Fixed: use item.link
         alt={item.name}
       />
 

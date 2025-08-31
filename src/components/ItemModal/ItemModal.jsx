@@ -24,11 +24,7 @@ function ItemModal({ activeModal, handleClose, card, onDelete }) {
           onClick={handleClose}
         ></button>
 
-        <img
-          src={card.imageUrl}
-          alt={card.name}
-          className="item__modal-image"
-        />
+        <img className="card__image" src={card.link} alt={card.name} />
 
         <div className="item__footer">
           <h2 className="item__modal-caption">{card.name}</h2>

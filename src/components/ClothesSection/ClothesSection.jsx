@@ -3,7 +3,12 @@ import ItemCard from "../ItemCard/ItemCard";
 import { useContext } from "react";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-function ClothesSection({ onCardClick, clothingItems, handleAddClick }) {
+function ClothesSection({
+  onCardClick,
+  clothingItems,
+  handleAddClick,
+  onCardLike,
+}) {
   const currentUser = useContext(CurrentUserContext);
 
   // Filter clothing items to only include those owned by the current user
@@ -26,12 +31,17 @@ function ClothesSection({ onCardClick, clothingItems, handleAddClick }) {
       {userItems.length > 0 ? (
         <ul className="cards__list">
           {userItems.map((item) => (
-            <ItemCard key={item._id} item={item} onCardClick={onCardClick} />
+            <ItemCard
+              key={item._id}
+              item={item}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike} // Add this prop
+            />
           ))}
         </ul>
       ) : (
         <p className="clothes__section-empty">
-          You haven’t added any items yet.
+          You haven't added any items yet.
         </p>
       )}
     </div>

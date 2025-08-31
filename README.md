@@ -1,27 +1,34 @@
-# Weather Wardrobe App
+# WTWR (What to Wear?)
 
-## Description
+## About
 
-Weather Wardrobe is a React-based web application that allows users to browse and submit clothing items appropriate for the current weather. It fetches real-time weather data and dynamically updates the UI to suggest clothing based on temperature and conditions. Users can also add new items through a modal form.
+WTWR is a React application that helps users decide what to wear based on current weather conditions.
+
+## Links
+
+- **Frontend Demo**: https://ttonjee.github.io/se_project_react/
+- **Backend Repository**: https://github.com/ttonjee/se_project_express
+
+## Technologies Used
+
+- React
+- JavaScript (ES6+)
+- CSS3
+- Webpack
+- API Integration
 
 ## Features
 
-- Displays current weather and matching clothing recommendations
-- Custom radio buttons for selecting temperature range
-- Modal form for submitting new clothing items
+- Weather-based clothing recommendations
+- User authentication
+- Personal clothing item management
+- Like/unlike functionality
 - Responsive design
-- Custom fonts and styles using CSS
 
-## Technologies and Techniques Used
+## Installation and Setup
 
-- **React**: Component-based UI development
-- **JavaScript (ES6+)**: Logic and interactivity
-- **HTML5 & CSS3**: Layout and styling
-- **CSS Flexbox and Grid**: For responsive layouts
-- **Custom Radio Buttons and Inputs**: Styled with pure CSS
-- **Weather API Integration**: (e.g., OpenWeatherMap or similar)
-- **Modal Management**: Accessible and dismissable forms
-- **Font Integration**: Custom font (Cabinet Grotesk)
-- **File Structure**: Organized by component, utility, and asset folders
-
-https://ttonjee.github.io/se_project_react/
+1. Clone this repository
+2. Clone the backend repository: https://github.com/ttonjee/se_project_express
+3. Install dependencies: `npm install`
+4. Start the development server: `npm start`
+5. Make sure the backend server is running on `http://localhost:3001`

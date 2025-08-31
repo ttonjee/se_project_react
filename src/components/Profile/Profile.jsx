@@ -2,20 +2,17 @@ import { useState } from "react";
 import ClothesSection from "../ClothesSection/ClothesSection";
 import "../Profile/Profile.css";
 import SideBar from "../SideBar/SideBar";
-import EditProfileModal from "../EditProfileModal/EditProfileModal";
+// Remove this import:
+// import EditProfileModal from "../EditProfileModal/EditProfileModal";
 
 function Profile({
   onCardClick,
   clothingItems,
   handleAddClick,
   onLogout,
-  onUpdateUser,
+  onCardLike,
+  onEditProfileClick, // Add this prop
 }) {
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-
-  const openEditProfileModal = () => setIsEditProfileOpen(true);
-  const closeEditProfileModal = () => setIsEditProfileOpen(false);
-
   return (
     <div className="profile">
       <section className="profile__sidebar">
@@ -23,7 +20,7 @@ function Profile({
         <div className="profile__info">
           <button
             className="profile__edit-button"
-            onClick={openEditProfileModal}
+            onClick={onEditProfileClick} // Use the prop from App
           >
             Change profile data
           </button>
@@ -38,14 +35,9 @@ function Profile({
           onCardClick={onCardClick}
           clothingItems={clothingItems}
           handleAddClick={handleAddClick}
+          onCardLike={onCardLike}
         />
       </section>
-
-      <EditProfileModal
-        isOpen={isEditProfileOpen}
-        handleClose={closeEditProfileModal}
-        onUpdateUser={onUpdateUser}
-      />
     </div>
   );
 }
