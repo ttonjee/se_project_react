@@ -84,7 +84,7 @@ function App() {
       })
       .then((userData) => {
         setCurrentUser(userData);
-        setActiveModal("");
+        closeActiveModal("");
       })
       .catch((err) => {
         // Show the actual error message from backend if available
@@ -115,6 +115,14 @@ function App() {
     setActiveModal("");
   };
 
+  const handleSwitchToRegister = () => {
+    setActiveModal("signup");
+  };
+
+  const handleSwitchToLogin = () => {
+    setActiveModal("login");
+  };
+
   const handleAddItemModalSubmit = ({ name, imageUrl, weather }) => {
     const token = localStorage.getItem("jwt");
 
@@ -126,8 +134,9 @@ function App() {
     postItem({ name, imageUrl, weather }, token)
       .then((newItem) => {
         setClothingItems((prevItems) => [newItem, ...prevItems]);
-        setActiveModal(""); // Close modal on success
+        closeActiveModal(""); // Close modal on success
       })
+
       .catch((error) => {
         console.error("Failed to post item:", error);
         alert("Failed to add item.");
@@ -182,6 +191,22 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    // Check for existing token on app load
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      getUserInfo(token)
+        .then((userData) => {
+          setCurrentUser(userData);
+        })
+        .catch((err) => {
+          console.error("Token validation failed:", err);
+
+          localStorage.removeItem("jwt");
+        });
+    }
+  }, []);
+
   const handleDeleteCard = (cardToDelete) => {
     const token = localStorage.getItem("jwt");
 
@@ -204,7 +229,7 @@ function App() {
         setClothingItems(updatedItems);
         setIsDeleteConfirmOpen(false); // Close modal after delete
         setCardToDelete(null);
-        setActiveModal("");
+        closeActiveModal("");
       })
       .catch((err) => {
         console.error("Failed to delete item:", err);
@@ -244,7 +269,7 @@ function App() {
             items.map((item) => (item._id === id ? updatedCard : item))
           );
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.err(err));
     } else {
       // Remove like
       removeCardLike(id, token)
@@ -311,12 +336,14 @@ function App() {
             isOpen={activeModal === "login"}
             handleClose={closeActiveModal}
             onLogin={handleLogin}
+            onSwitchToRegister={handleSwitchToRegister}
           />
 
           <RegisterModal
             isOpen={activeModal === "signup"}
             handleClose={closeActiveModal}
             onRegister={handleRegister}
+            onSwitchToLogin={handleSwitchToLogin}
           />
 
           <AddItemModal

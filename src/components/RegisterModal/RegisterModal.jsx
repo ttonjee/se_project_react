@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { register } from "../../utils/auth";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
-function RegisterModal({ isOpen, handleClose, onRegister }) {
+function RegisterModal({ isOpen, handleClose, onRegister, onSwitchToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -10,28 +9,46 @@ function RegisterModal({ isOpen, handleClose, onRegister }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onRegister({ name, avatar, email, password });
+
+    // Validation
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    console.log("Submitting registration with:", {
+      name,
+      avatar,
+      email,
+      password,
+    });
+    onRegister({
+      name: name.trim(),
+      avatar: avatar.trim(),
+      email: email.trim(),
+      password,
+    });
   };
 
   return (
     <ModalWithForm
+      titleText="Sign up"
+      buttonText="Sign up"
+      alternativeButton={
+        <button
+          type="button"
+          className="modal__alt-button"
+          onClick={onSwitchToLogin}
+        >
+          or Log in
+        </button>
+      }
       isOpen={isOpen}
       handleClose={handleClose}
       onSubmit={handleSubmit}
-      titleText="Sign Up"
-      buttonText={"Next"}
-      secondaryButton={
-        <button
-          type="button"
-          className="modal__login-btn"
-          onClick={handleClose}
-        >
-          or Log In
-        </button>
-      }
     >
       <label>
-        Email
+        Email*
         <input
           type="email"
           className="modal__input-line"
@@ -42,7 +59,7 @@ function RegisterModal({ isOpen, handleClose, onRegister }) {
         />
       </label>
       <label>
-        Password
+        Password*
         <input
           type="password"
           className="modal__input-line"
@@ -53,7 +70,7 @@ function RegisterModal({ isOpen, handleClose, onRegister }) {
         />
       </label>
       <label>
-        Name
+        Name*
         <input
           type="text"
           className="modal__input-line"
@@ -69,9 +86,8 @@ function RegisterModal({ isOpen, handleClose, onRegister }) {
           type="url"
           className="modal__input-line"
           value={avatar}
-          placeholder="Avatar URL"
+          placeholder="Avatar URL (optional)"
           onChange={(e) => setAvatar(e.target.value)}
-          required
         />
       </label>
     </ModalWithForm>

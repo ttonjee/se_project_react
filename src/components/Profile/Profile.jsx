@@ -2,8 +2,6 @@ import { useState } from "react";
 import ClothesSection from "../ClothesSection/ClothesSection";
 import "../Profile/Profile.css";
 import SideBar from "../SideBar/SideBar";
-// Remove this import:
-// import EditProfileModal from "../EditProfileModal/EditProfileModal";
 
 function Profile({
   onCardClick,
@@ -11,17 +9,14 @@ function Profile({
   handleAddClick,
   onLogout,
   onCardLike,
-  onEditProfileClick, // Add this prop
+  onEditProfileClick,
 }) {
   return (
     <div className="profile">
       <section className="profile__sidebar">
         <SideBar />
         <div className="profile__info">
-          <button
-            className="profile__edit-button"
-            onClick={onEditProfileClick} // Use the prop from App
-          >
+          <button className="profile__edit-button" onClick={onEditProfileClick}>
             Change profile data
           </button>
           <button className="profile__sign-out-button" onClick={onLogout}>
