@@ -6,11 +6,13 @@
   "homepage": "https://flexx.crabdance.com",
   "scripts": {
     "dev": "vite --open",
+    "server": "json-server --watch db.json --port 3002",
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && scp -r ./dist/* thetonjees07@flexx.crabdance.com:/home/thetonjees07/frontend"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -22,6 +24,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "concurrently": "^9.2.1",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.32.0",
@@ -30,6 +33,7 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "gh-pages": "^6.3.0",
     "globals": "^15.11.0",
+    "json-server": "^1.0.0-beta.3",
     "vite": "^5.4.10"
   }
 }

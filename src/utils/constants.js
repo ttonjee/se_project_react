@@ -83,9 +83,10 @@ export const APIkey = "0e74d67e874dc805c5831c4aa96d9884";
 
 // Base URL for your backend API
 export const BASE_URL =
-  process.env.NODE_ENV === "production"
+  (typeof process !== 'undefined' && process.env?.NODE_ENV === "production") ||
+  import.meta.env?.PROD
     ? "https://api.flexx.crabdance.com"
-    : "http://localhost:3001";
+    : "http://localhost:3002"; // Use local JSON server for development
 
 // Export with both naming conventions for compatibility
 export const apiKey = APIkey;

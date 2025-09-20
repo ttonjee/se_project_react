@@ -2,7 +2,7 @@ import { BASE_URL } from "../utils/constants.js";
 import { checkResponse } from "./api";
 import { ValidationError, AuthError, NetworkError } from "./errors";
 
-const baseUrl = "http://localhost:3001";
+const baseUrl = BASE_URL;
 
 // Helper function to validate required fields using custom error constructors
 const validateAuthInput = (data, requiredFields) => {
