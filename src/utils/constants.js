@@ -9,25 +9,21 @@ export const weatherOptions = [
     condition: "clouds",
     url: new URL("../assets/day/cloudy.png", import.meta.url).href,
   },
-
   {
     day: true,
     condition: "rain",
     url: new URL("../assets/day/rainy.png", import.meta.url).href,
   },
-
   {
     day: false,
     condition: "clear",
     url: new URL("../assets/night/night.png", import.meta.url).href,
   },
-
   {
     day: false,
     condition: "few clouds",
     url: new URL("../assets/night/nightcloudy.png", import.meta.url).href,
   },
-
   {
     day: false,
     condition: "rain",
@@ -79,4 +75,18 @@ export const coordinates = {
   longitude: -98.493629,
 };
 
+// Define location before exporting it
+export const location = "San Antonio, TX";
+
+// Weather API configuration
 export const APIkey = "0e74d67e874dc805c5831c4aa96d9884";
+
+// Base URL for your backend API
+export const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.flexx.crabdance.com"
+    : "http://localhost:3001";
+
+// Export with both naming conventions for compatibility
+export const apiKey = APIkey;
+export const baseUrl = BASE_URL;

@@ -14,6 +14,7 @@ import AddItemModal from "../AddItemModal/AddItemModal";
 import { defaultClothingItems } from "../../utils/constants";
 import Profile from "../Profile/Profile";
 import SideBar from "../SideBar/SideBar";
+import { AuthError, ValidationError, NetworkError } from "../../utils/errors";
 import {
   getItems,
   postItem,
@@ -27,6 +28,7 @@ import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import RegisterModal from "../RegisterModal/RegisterModal";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import logger from "../../utils/logger";
 
 function App() {
   const [weatherData, setWeatherData] = useState({
@@ -59,47 +61,96 @@ function App() {
     return checkToken(token);
   };
 
-  const handleLogin = ({ email, password }) => {
-    login({ email, password })
-      .then((res) => {
-        localStorage.setItem("jwt", res.token);
-        return getUserInfo(res.token);
-      })
-      .then((userData) => {
-        setCurrentUser(userData);
-        setActiveModal("");
-      })
-      .catch((err) => {
-        console.error("Login failed:", err);
-        alert("Login failed. Please try again.");
+  const handleLogin = async ({ email, password }) => {
+    logger.auth("login_attempt", { email });
+
+    try {
+      const res = await login({ email, password });
+      localStorage.setItem("jwt", res.token);
+      const userData = await getUserInfo(res.token);
+      setCurrentUser(userData);
+      setActiveModal("");
+
+      logger.info("Login successful", {
+        userId: userData._id,
+        email: userData.email,
       });
+      logger.auth("login_success", { userId: userData._id });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error("Authentication error during login", error, { email });
+        alert("Invalid email or password. Please try again.");
+      } else if (error instanceof ValidationError) {
+        logger.error("Validation error during login", error, { email });
+        alert(`Please check your input: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error("Network error during login", error, { email });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error("Unexpected login error", error, { email });
+        alert(`Login failed: ${error.message || "Please try again."}`);
+      }
+
+      logger.auth("login_failed", { email, errorType: error.constructor.name });
+    }
   };
 
-  const handleRegister = ({ name, avatar, email, password }) => {
-    register({ name, avatar, email, password })
-      .then(() => login({ email, password }))
-      .then((res) => {
-        localStorage.setItem("jwt", res.token);
-        return getUserInfo(res.token);
-      })
-      .then((userData) => {
-        setCurrentUser(userData);
-        closeActiveModal("");
-      })
-      .catch((err) => {
-        // Show the actual error message from backend if available
-        console.error("Registration or login failed:", err);
-        alert(
-          err.message ||
-            err ||
-            "Registration or login failed. Please try again."
-        );
+  const handleRegister = async ({ name, avatar, email, password }) => {
+    logger.auth("registration_attempt", { email, name });
+
+    try {
+      await register({ name, avatar, email, password });
+      const res = await login({ email, password });
+      localStorage.setItem("jwt", res.token);
+      const userData = await getUserInfo(res.token);
+      setCurrentUser(userData);
+      closeActiveModal();
+
+      logger.info("Registration and login successful", {
+        userId: userData._id,
+        email: userData.email,
+        name: userData.name,
       });
+      logger.auth("registration_success", { userId: userData._id });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error("Authentication error during registration", error, {
+          email,
+          name,
+        });
+        alert("Registration failed. Email may already be in use.");
+      } else if (error instanceof ValidationError) {
+        logger.error("Validation error during registration", error, {
+          email,
+          name,
+        });
+        alert(`Please check your input: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error("Network error during registration", error, {
+          email,
+          name,
+        });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error("Unexpected registration error", error, { email, name });
+        alert(`Registration failed: ${error.message || "Please try again."}`);
+      }
+
+      logger.auth("registration_failed", {
+        email,
+        name,
+        errorType: error.constructor.name,
+      });
+    }
   };
 
   const handleLogout = () => {
+    const userId = currentUser?._id;
     localStorage.removeItem("jwt");
     setCurrentUser(null);
+
+    logger.auth("logout", { userId });
+    logger.info("User logged out", { userId });
   };
 
   const handleCardClick = (card) => {
@@ -123,56 +174,143 @@ function App() {
     setActiveModal("login");
   };
 
-  const handleAddItemModalSubmit = ({ name, imageUrl, weather }) => {
+  // Enhanced handleAddItemModalSubmit with centralized error handling
+  const handleAddItemModalSubmit = async ({ name, imageUrl, weather }) => {
     const token = localStorage.getItem("jwt");
+    const userId = currentUser?._id;
 
-    if (!token) {
-      alert("Please log in to add items.");
-      return;
-    }
+    logger.userAction("item_creation_attempt", { name, weather, userId });
 
-    postItem({ name, imageUrl, weather }, token)
-      .then((newItem) => {
-        setClothingItems((prevItems) => [newItem, ...prevItems]);
-        closeActiveModal(""); // Close modal on success
-      })
+    try {
+      const newItem = await postItem({ name, imageUrl, weather }, token);
+      setClothingItems((prevItems) => [newItem, ...prevItems]);
+      closeActiveModal();
 
-      .catch((error) => {
-        console.error("Failed to post item:", error);
-        alert("Failed to add item.");
+      logger.info("Item created successfully", {
+        itemId: newItem._id,
+        name: newItem.name,
+        userId,
       });
+      logger.userAction("item_creation_success", {
+        itemId: newItem._id,
+        userId,
+      });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error("Authentication error during item creation", error, {
+          name,
+          weather,
+          userId,
+        });
+        alert("Please log in to add items.");
+        setActiveModal("login");
+      } else if (error instanceof ValidationError) {
+        logger.error("Validation error during item creation", error, {
+          name,
+          weather,
+          userId,
+        });
+        alert(`Invalid data: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error("Network error during item creation", error, {
+          name,
+          weather,
+          userId,
+        });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error("Unexpected error during item creation", error, {
+          name,
+          weather,
+          userId,
+        });
+        alert(`Failed to add item: ${error.message || "Please try again."}`);
+      }
+
+      logger.userAction("item_creation_failed", {
+        name,
+        weather,
+        userId,
+        errorType: error.constructor.name,
+      });
+    }
   };
 
-  // New: handle updating user profile
-  const handleUpdateUser = ({ name, avatar }) => {
+  // Enhanced handleUpdateUser with centralized error handling
+  const handleUpdateUser = async ({ name, avatar }) => {
     const token = localStorage.getItem("jwt");
-    if (!token) {
-      alert("Please log in to update your profile.");
-      return;
-    }
+    const userId = currentUser?._id;
 
-    updateUser({ name, avatar }, token)
-      .then((updatedUser) => {
-        setCurrentUser(updatedUser);
-        setIsEditProfileOpen(false);
-      })
-      .catch((err) => {
-        console.error("Failed to update user:", err);
-        alert("Failed to update profile. Please try again.");
+    logger.userAction("profile_update_attempt", { name, userId });
+
+    try {
+      const updatedUser = await updateUser({ name, avatar }, token);
+      setCurrentUser(updatedUser);
+      setIsEditProfileOpen(false);
+
+      logger.info("Profile updated successfully", {
+        userId: updatedUser._id,
+        name: updatedUser.name,
       });
+      logger.userAction("profile_update_success", { userId });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error("Authentication error during profile update", error, {
+          name,
+          userId,
+        });
+        alert("Please log in to update your profile.");
+        setActiveModal("login");
+      } else if (error instanceof ValidationError) {
+        logger.error("Validation error during profile update", error, {
+          name,
+          userId,
+        });
+        alert(`Please check your input: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error("Network error during profile update", error, {
+          name,
+          userId,
+        });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error("Unexpected error during profile update", error, {
+          name,
+          userId,
+        });
+        alert(
+          `Failed to update profile: ${error.message || "Please try again."}`
+        );
+      }
+
+      logger.userAction("profile_update_failed", {
+        name,
+        userId,
+        errorType: error.constructor.name,
+      });
+    }
   };
 
+  // Update useEffect hooks with logging
   useEffect(() => {
+    logger.info("Fetching weather data", { coordinates });
+
     getWeather(coordinates, APIkey)
       .then((data) => {
         const filteredData = filterWeatherData(data);
         setWeatherData(filteredData);
+        logger.info("Weather data loaded successfully", {
+          city: filteredData.city,
+        });
       })
-      .catch(console.error);
+      .catch((error) => {
+        logger.error("Failed to fetch weather data", error, { coordinates });
+      });
   }, []);
 
   useEffect(() => {
-    // Fetch items for all users (public endpoint)
+    logger.info("Fetching clothing items");
+
     getItems()
       .then((data) => {
         const normalized = data
@@ -183,58 +321,99 @@ function App() {
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         setClothingItems(normalized);
+        logger.info("Clothing items loaded successfully", {
+          itemCount: normalized.length,
+        });
       })
       .catch((err) => {
-        console.error("Failed to fetch items:", err);
-        // Fallback to default items if server fails
+        logger.error("Failed to fetch items", err);
         setClothingItems(defaultClothingItems);
+        logger.warn("Fallback to default items", {
+          defaultItemCount: defaultClothingItems.length,
+        });
       });
   }, []);
 
   useEffect(() => {
-    // Check for existing token on app load
     const token = localStorage.getItem("jwt");
     if (token) {
+      logger.info("Validating existing token");
+
       getUserInfo(token)
         .then((userData) => {
           setCurrentUser(userData);
+          logger.auth("token_validation_success", { userId: userData._id });
         })
         .catch((err) => {
-          console.error("Token validation failed:", err);
-
+          logger.error("Token validation failed", err);
           localStorage.removeItem("jwt");
+          logger.auth("token_validation_failed");
         });
     }
   }, []);
 
-  const handleDeleteCard = (cardToDelete) => {
+  // Enhanced handleDeleteCard with centralized error handling
+  const handleDeleteCard = async (cardToDelete) => {
     const token = localStorage.getItem("jwt");
+    const userId = currentUser?._id;
 
-    if (!token) {
-      alert("Please log in to delete items.");
-      return;
-    }
+    logger.userAction("item_deletion_attempt", {
+      itemId: cardToDelete._id,
+      userId,
+    });
 
-    if (!cardToDelete?._id) {
-      console.warn("Invalid card object:", cardToDelete);
-      alert("Unable to delete this item. Please try again.");
-      return;
-    }
+    try {
+      await deleteItem(cardToDelete._id, token);
+      const updatedItems = clothingItems.filter(
+        (item) => item._id !== cardToDelete._id
+      );
+      setClothingItems(updatedItems);
+      setIsDeleteConfirmOpen(false);
+      setCardToDelete(null);
+      closeActiveModal();
 
-    deleteItem(cardToDelete._id, token)
-      .then(() => {
-        const updatedItems = clothingItems.filter(
-          (item) => item._id !== cardToDelete._id
-        );
-        setClothingItems(updatedItems);
-        setIsDeleteConfirmOpen(false); // Close modal after delete
-        setCardToDelete(null);
-        closeActiveModal("");
-      })
-      .catch((err) => {
-        console.error("Failed to delete item:", err);
-        alert("Failed to delete item. Please try again.");
+      logger.info("Item deleted successfully", {
+        itemId: cardToDelete._id,
+        userId,
       });
+      logger.userAction("item_deletion_success", {
+        itemId: cardToDelete._id,
+        userId,
+      });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error("Authentication error during item deletion", error, {
+          itemId: cardToDelete._id,
+          userId,
+        });
+        alert("Please log in to delete items.");
+        setActiveModal("login");
+      } else if (error instanceof ValidationError) {
+        logger.error("Validation error during item deletion", error, {
+          itemId: cardToDelete._id,
+          userId,
+        });
+        alert(`Invalid request: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error("Network error during item deletion", error, {
+          itemId: cardToDelete._id,
+          userId,
+        });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error("Unexpected error during item deletion", error, {
+          itemId: cardToDelete._id,
+          userId,
+        });
+        alert(`Failed to delete item: ${error.message || "Please try again."}`);
+      }
+
+      logger.userAction("item_deletion_failed", {
+        itemId: cardToDelete._id,
+        userId,
+        errorType: error.constructor.name,
+      });
+    }
   };
 
   // Add this new function to open the confirmation modal
@@ -253,32 +432,60 @@ function App() {
     setIsEditProfileOpen(false);
   };
 
-  const handleCardLike = ({ id, isLiked }) => {
-    const token = localStorage.getItem("jwt");
+  const handleCardLike = async ({ id, isLiked }) => {
+    const action = isLiked ? "unlike" : "like";
+    const userId = currentUser?._id;
 
-    if (!token) {
-      alert("Please log in to like items.");
-      return;
-    }
+    logger.userAction(`item_${action}_attempt`, { itemId: id, userId });
 
-    if (!isLiked) {
-      // Add like
-      addCardLike(id, token)
-        .then((updatedCard) => {
-          setClothingItems((items) =>
-            items.map((item) => (item._id === id ? updatedCard : item))
-          );
-        })
-        .catch((err) => console.err(err));
-    } else {
-      // Remove like
-      removeCardLike(id, token)
-        .then((updatedCard) => {
-          setClothingItems((items) =>
-            items.map((item) => (item._id === id ? updatedCard : item))
-          );
-        })
-        .catch((err) => console.log(err));
+    try {
+      const token = localStorage.getItem("jwt");
+      let updatedCard;
+
+      if (!isLiked) {
+        updatedCard = await addCardLike(id, token);
+      } else {
+        updatedCard = await removeCardLike(id, token);
+      }
+
+      setClothingItems((items) =>
+        items.map((item) => (item._id === id ? updatedCard : item))
+      );
+
+      logger.userAction(`item_${action}_success`, { itemId: id, userId });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        logger.error(`Authentication error during ${action}`, error, {
+          itemId: id,
+          userId,
+        });
+        alert("Please log in to like items.");
+        setActiveModal("login");
+      } else if (error instanceof ValidationError) {
+        logger.error(`Validation error during ${action}`, error, {
+          itemId: id,
+          userId,
+        });
+        alert(`Invalid request: ${error.message}`);
+      } else if (error instanceof NetworkError) {
+        logger.error(`Network error during ${action}`, error, {
+          itemId: id,
+          userId,
+        });
+        alert("Connection issue. Please check your internet and try again.");
+      } else {
+        logger.error(`Unexpected error during ${action}`, error, {
+          itemId: id,
+          userId,
+        });
+        alert(`Failed to update like: ${error.message || "Please try again."}`);
+      }
+
+      logger.userAction(`item_${action}_failed`, {
+        itemId: id,
+        userId,
+        errorType: error.constructor.name,
+      });
     }
   };
 
